@@ -1,0 +1,39 @@
+#include <stdio.h>
+
+// Function to calculate power using binary exponentiation
+double myPow(double x, int n) {
+    if (n == 0) return 1.0;
+    
+    long long N = n;
+    if (N < 0) {
+        x = 1 / x;
+        N = -N;
+    }
+    
+    double result = 1.0;
+    while (N > 0) {
+        if (N % 2 == 1) {
+            result *= x;
+        }
+        x *= x;
+        N /= 2;
+    }
+    
+    return result;
+}
+
+int main() {
+    double x1 = 2.00000;
+    int n1 = 10;
+    printf("%.5f\n", myPow(x1, n1));
+    
+    double x2 = 2.10000;
+    int n2 = 3;
+    printf("%.5f\n", myPow(x2, n2));
+    
+    double x3 = 2.00000;
+    int n3 = -2;
+    printf("%.5f\n", myPow(x3, n3));
+    
+    return 0;
+}
