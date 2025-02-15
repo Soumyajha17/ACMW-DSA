@@ -1,0 +1,52 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Function to find elements that appear more than n/3 times
+void majorityElement(int* nums, int numsSize) {
+    int candidate1 = 0, candidate2 = 0, count1 = 0, count2 = 0;
+    
+    // Finding potential candidates
+    for (int i = 0; i < numsSize; i++) {
+        if (nums[i] == candidate1) {
+            count1++;
+        } else if (nums[i] == candidate2) {
+            count2++;
+        } else if (count1 == 0) {
+            candidate1 = nums[i];
+            count1 = 1;
+        } else if (count2 == 0) {
+            candidate2 = nums[i];
+            count2 = 1;
+        } else {
+            count1--;
+            count2--;
+        }
+    }
+    
+    // Validating candidates
+    count1 = count2 = 0;
+    for (int i = 0; i < numsSize; i++) {
+        if (nums[i] == candidate1) count1++;
+        else if (nums[i] == candidate2) count2++;
+    }
+    
+    if (count1 > numsSize / 3) printf("%d ", candidate1);
+    if (count2 > numsSize / 3) printf("%d", candidate2);
+    printf("\n");
+}
+
+int main() {
+    int nums1[] = {3, 2, 3};
+    int numsSize1 = sizeof(nums1) / sizeof(nums1[0]);
+    majorityElement(nums1, numsSize1);
+    
+    int nums2[] = {1};
+    int numsSize2 = sizeof(nums2) / sizeof(nums2[0]);
+    majorityElement(nums2, numsSize2);
+    
+    int nums3[] = {1, 2};
+    int numsSize3 = sizeof(nums3) / sizeof(nums3[0]);
+    majorityElement(nums3, numsSize3);
+    
+    return 0;
+}
