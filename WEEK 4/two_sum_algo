@@ -1,0 +1,92 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Structure to store key-value pairs in the hash table
+typedef struct {
+    int key;   // Stores the number
+    int value; // Stores the index
+} HashEntry;
+
+// Hash table implementation using separate chaining
+typedef struct {
+    HashEntry *entries;
+    int size;
+} HashTable;
+
+// Create a hash table
+HashTable* createHashTable(int size) {
+    HashTable* table = (HashTable*)malloc(sizeof(HashTable));
+    table->size = size;
+    table->entries = (HashEntry*)calloc(size, sizeof(HashEntry));
+    return table;
+}
+
+// Hash function
+int hashFunction(int key, int size) {
+    return abs(key) % size;
+}
+
+// Insert key-value pair into hash table
+void insert(HashTable* table, int key, int value) {
+    int index = hashFunction(key, table->size);
+    while (table->entries[index].key != 0) {
+        index = (index + 1) % table->size;  // Linear probing
+    }
+    table->entries[index].key = key;
+    table->entries[index].value = value;
+}
+
+// Search for a key in the hash table
+int search(HashTable* table, int key) {
+    int index = hashFunction(key, table->size);
+    while (table->entries[index].key != 0) {
+        if (table->entries[index].key == key) {
+            return table->entries[index].value;
+        }
+        index = (index + 1) % table->size;  // Linear probing
+    }
+    return -1;  // Key not found
+}
+
+// Function to find two sum
+int* twoSum(int* nums, int numsSize, int target, int* returnSize) {
+    HashTable* table = createHashTable(numsSize);
+    int* result = (int*)malloc(2 * sizeof(int));
+
+    for (int i = 0; i < numsSize; i++) {
+        int complement = target - nums[i];
+        int index = search(table, complement);
+
+        if (index != -1) {
+            result[0] = index;
+            result[1] = i;
+            *returnSize = 2;
+            free(table->entries);
+            free(table);
+            return result;
+        }
+
+        insert(table, nums[i], i);
+    }
+
+    free(result);
+    *returnSize = 0;
+    return NULL;
+}
+
+// Main function to test the twoSum function
+int main() {
+    int nums[] = {2, 7, 11, 15};
+    int target = 9;
+    int returnSize;
+    int* result = twoSum(nums, 4, target, &returnSize);
+
+    if (returnSize == 2) {
+        printf("[%d, %d]\n", result[0], result[1]);
+    } else {
+        printf("No solution found\n");
+    }
+
+    free(result);
+    return 0;
+}
