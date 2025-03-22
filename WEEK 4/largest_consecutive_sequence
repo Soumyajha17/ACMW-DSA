@@ -1,0 +1,87 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Hash set implementation using a structure
+typedef struct {
+    int *table;
+    int size;
+} HashSet;
+
+// Function to create a hash set
+HashSet* createHashSet(int size) {
+    HashSet* set = (HashSet*)malloc(sizeof(HashSet));
+    set->size = size;
+    set->table = (int*)calloc(size, sizeof(int)); // Initialize all to 0
+    return set;
+}
+
+// Hash function
+int hashFunction(int key, int size) {
+    return abs(key) % size;
+}
+
+// Insert element into hash set
+void insert(HashSet* set, int key) {
+    int index = hashFunction(key, set->size);
+    while (set->table[index] != 0 && set->table[index] != key) {
+        index = (index + 1) % set->size; // Linear probing
+    }
+    set->table[index] = key;
+}
+
+// Check if element exists in hash set
+int contains(HashSet* set, int key) {
+    int index = hashFunction(key, set->size);
+    while (set->table[index] != 0) {
+        if (set->table[index] == key) return 1;
+        index = (index + 1) % set->size; // Linear probing
+    }
+    return 0;
+}
+
+// Function to find the longest consecutive sequence length
+int longestConsecutive(int* nums, int numsSize) {
+    if (numsSize == 0) return 0;
+
+    HashSet* set = createHashSet(numsSize * 2); // Create hash set
+    for (int i = 0; i < numsSize; i++) {
+        insert(set, nums[i]); // Insert all numbers into hash set
+    }
+
+    int maxStreak = 0;
+
+    for (int i = 0; i < numsSize; i++) {
+        if (!contains(set, nums[i] - 1)) { // Start of a new sequence
+            int currentNum = nums[i];
+            int streak = 1;
+
+            while (contains(set, currentNum + 1)) { // Count sequence length
+                currentNum++;
+                streak++;
+            }
+
+            if (streak > maxStreak) maxStreak = streak;
+        }
+    }
+
+    free(set->table);
+    free(set);
+    return maxStreak;
+}
+
+// Main function to test the longest consecutive sequence function
+int main() {
+    int nums1[] = {100, 4, 200, 1, 3, 2};
+    int size1 = sizeof(nums1) / sizeof(nums1[0]);
+    printf("Output: %d\n", longestConsecutive(nums1, size1)); // Expected: 4
+
+    int nums2[] = {0, 3, 7, 2, 5, 8, 4, 6, 0, 1};
+    int size2 = sizeof(nums2) / sizeof(nums2[0]);
+    printf("Output: %d\n", longestConsecutive(nums2, size2)); // Expected: 9
+
+    int nums3[] = {1, 0, 1, 2};
+    int size3 = sizeof(nums3) / sizeof(nums3[0]);
+    printf("Output: %d\n", longestConsecutive(nums3, size3)); // Expected: 3
+
+    return 0;
+}
