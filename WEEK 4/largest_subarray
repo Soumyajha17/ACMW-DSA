@@ -1,0 +1,92 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Hash table entry
+typedef struct {
+    int key;   // Stores the prefix sum
+    int value; // Stores the first occurrence index
+} HashEntry;
+
+// Hash table structure
+typedef struct {
+    HashEntry *entries;
+    int size;
+} HashTable;
+
+// Create a hash table
+HashTable* createHashTable(int size) {
+    HashTable* table = (HashTable*)malloc(sizeof(HashTable));
+    table->size = size;
+    table->entries = (HashEntry*)calloc(size, sizeof(HashEntry));
+    return table;
+}
+
+// Hash function
+int hashFunction(int key, int size) {
+    return abs(key) % size;
+}
+
+// Insert into hash table (with linear probing)
+void insert(HashTable* table, int key, int value) {
+    int index = hashFunction(key, table->size);
+    while (table->entries[index].key != 0) {
+        if (table->entries[index].key == key) return; // Avoid overwriting
+        index = (index + 1) % table->size;
+    }
+    table->entries[index].key = key;
+    table->entries[index].value = value;
+}
+
+// Search in hash table
+int search(HashTable* table, int key) {
+    int index = hashFunction(key, table->size);
+    while (table->entries[index].key != 0) {
+        if (table->entries[index].key == key) return table->entries[index].value;
+        index = (index + 1) % table->size;
+    }
+    return -1;
+}
+
+// Function to find the largest subarray with sum 0
+int largestZeroSumSubarray(int* arr, int n) {
+    HashTable* table = createHashTable(n * 2); // Create hash table
+
+    int maxLen = 0, prefixSum = 0;
+
+    for (int i = 0; i < n; i++) {
+        prefixSum += arr[i];
+
+        if (prefixSum == 0) {
+            maxLen = i + 1; // Whole subarray from start has sum 0
+        }
+
+        int prevIndex = search(table, prefixSum);
+        if (prevIndex != -1) {
+            maxLen = (i - prevIndex > maxLen) ? i - prevIndex : maxLen;
+        } else {
+            insert(table, prefixSum, i); // Store first occurrence
+        }
+    }
+
+    free(table->entries);
+    free(table);
+    return maxLen;
+}
+
+// Main function to test the solution
+int main() {
+    int arr1[] = {15, -2, 2, -8, 1, 7, 10, 23};
+    int size1 = sizeof(arr1) / sizeof(arr1[0]);
+    printf("Output: %d\n", largestZeroSumSubarray(arr1, size1)); // Expected: 5
+
+    int arr2[] = {2, 10, 4};
+    int size2 = sizeof(arr2) / sizeof(arr2[0]);
+    printf("Output: %d\n", largestZeroSumSubarray(arr2, size2)); // Expected: 0
+
+    int arr3[] = {1, 0, -4, 3, 1, 0};
+    int size3 = sizeof(arr3) / sizeof(arr3[0]);
+    printf("Output: %d\n", largestZeroSumSubarray(arr3, size3)); // Expected: 5
+
+    return 0;
+}
+
