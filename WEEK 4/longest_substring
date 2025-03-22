@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_CHAR 256 // Total possible characters (ASCII)
+
+// Function to find the length of the longest substring without repeating characters
+int lengthOfLongestSubstring(char *s) {
+    int n = strlen(s);
+    if (n == 0) return 0;
+
+    int lastSeen[MAX_CHAR]; // Array to store last seen position of characters
+    memset(lastSeen, -1, sizeof(lastSeen)); // Initialize all to -1
+
+    int left = 0, maxLength = 0;
+
+    for (int right = 0; right < n; right++) {
+        if (lastSeen[s[right]] >= left) {
+            left = lastSeen[s[right]] + 1; // Move the left pointer to exclude duplicate
+        }
+        lastSeen[s[right]] = right; // Update last seen index
+        maxLength = (right - left + 1 > maxLength) ? right - left + 1 : maxLength;
+    }
+
+    return maxLength;
+}
+
+// Main function to test the solution
+int main() {
+    char s1[] = "abcabcbb";
+    printf("Output: %d\n", lengthOfLongestSubstring(s1)); // Expected: 3
+
+    char s2[] = "bbbbb";
+    printf("Output: %d\n", lengthOfLongestSubstring(s2)); // Expected: 1
+
+    char s3[] = "pwwkew";
+    printf("Output: %d\n", lengthOfLongestSubstring(s3)); // Expected: 3
+
+    return 0;
+}
